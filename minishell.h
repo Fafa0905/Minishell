@@ -6,7 +6,7 @@
 /*   By: ssoukoun <ssoukoun@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 16:44:19 by ssoukoun          #+#    #+#             */
-/*   Updated: 2025/02/02 18:41:06 by ssoukoun         ###   ########.fr       */
+/*   Updated: 2025/02/03 17:16:55 by ssoukoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,11 @@
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <fcntl.h>
+#include <sys/wait.h>
 
 
-typedef enum tolkien
+typedef enum token
 {
     NO_DEF,
     CMD,
@@ -32,18 +34,22 @@ typedef enum tolkien
     IN,
     D_IN,
     OUT,
-    D_OUT
-};
+    D_OUT,
+    FD
+}s_token;
 
 typedef struct part
 {
-	tolkien     type;
-    char        *part;
+    char     *part;
+    char    **args;
+    char    *cmd;
+    int 
+    s_token      type;
 }				t_p;
 
 typedef struct mini
 {
-	char		*pieces
+	t_p		*pieces;
 
 }				t_mini;
 

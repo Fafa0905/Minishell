@@ -6,7 +6,7 @@
 /*   By: ssoukoun <ssoukoun@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 16:44:19 by ssoukoun          #+#    #+#             */
-/*   Updated: 2025/02/03 17:16:55 by ssoukoun         ###   ########.fr       */
+/*   Updated: 2025/02/04 13:14:36 by ssoukoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <readline/history.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <stdbool.h>
 
 
 typedef enum token
@@ -43,8 +44,7 @@ typedef struct part
     char     *part;
     char    **args;
     char    *cmd;
-    int 
-    s_token      type;
+    s_token     type;
 }				t_p;
 
 typedef struct mini

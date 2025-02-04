@@ -1,36 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fsingh <fsingh@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/01 15:43:20 by marvin            #+#    #+#             */
+/*   Created: 2025/02/04 17:56:48 by fsingh            #+#    #+#             */
 /*   Updated: 2025/02/04 17:58:05 by fsingh           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
 
-int	main(int ac, char **argv, char **env)
+void	*create_token(t_token **tokens, char *cmd_line, t_mini *mini)
 {
-	t_mini	*mini;
-    char	*input;
-	(void)argv;
-	(void)ac;
-	int i;
-	
-	i = 0;
-	while (1)
+	(*tokens) = NULL;
+
+	while (*cmd_line)
 	{
-	input = readline("user:");
-	if (!input)
-	{
+		while (isspace(*cmd_line))
+			cmd_line++;
+        if (!*cmd_line)
+            break;
+        if (is_special(cmd_line))
+		{
+			if (!add_special(tokens, &cmd_line))
+				free_shell(mini);
+		}
+		else
+		{
+			if (!add_cmd(tokens, &cmd_line))
+				free_shell(mini);
+		}
+	}
+}
+
+void	parsing(char *input, t_mini *mini)
+{
+	if(open_quote(mini, input))
 		free_shell(mini);
-		break;
-	}
-	parsing(input, mini);
-	add_history(input);
-	free(input);
-	}
-	return (0);
+	replace_dollar(&input, mini);
+	create_token(&mini->token, input, mini);
 }

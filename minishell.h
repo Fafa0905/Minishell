@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ssoukoun <ssoukoun@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fsingh <fsingh@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 16:44:19 by ssoukoun          #+#    #+#             */
-/*   Updated: 2025/02/03 17:16:55 by ssoukoun         ###   ########.fr       */
+/*   Updated: 2025/02/04 17:58:05 by fsingh           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 # define MINI_H
 
 # include "./libft/libft.h"
-# include "./printf/ft_printf.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <readline/readline.h>
@@ -22,35 +21,36 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 
+# define IN 		1
+# define HEREDOC	2
+# define OUT		3
+# define D_OUT		4
+# define PIPE		5
+# define CMD		6
+# define ARG		7
+# define DOLLAR     8
 
-typedef enum token
+typedef struct s_cmd
 {
-    NO_DEF,
-    CMD,
-    PIPE,
-    QUOTE,
-    D_QUOTE,
-    DOLLAR,
-    IN,
-    D_IN,
-    OUT,
-    D_OUT,
-    FD
-}s_token;
+    int             infile;
+    int             outfile;
+    char            **cmd_param;
+	struct s_token	*prev;
+	struct s_token	*next;
+}              t_cmd;
 
-typedef struct part
+typedef struct token
 {
-    char     *part;
-    char    **args;
-    char    *cmd;
-    int 
-    s_token      type;
-}				t_p;
+    char            *value;
+    int             type;
+	struct s_token	*prev;
+	struct s_token	*next;
+}				t_token;
 
 typedef struct mini
 {
-	t_p		*pieces;
-
+	t_token *token;
+    t_cmd   *cmd;  
 }				t_mini;
 
 #endif

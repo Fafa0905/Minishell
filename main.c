@@ -3,19 +3,59 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ssoukoun <ssoukoun@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fsingh <fsingh@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 15:43:20 by marvin            #+#    #+#             */
-/*   Updated: 2025/02/03 18:05:46 by ssoukoun         ###   ########.fr       */
+/*   Updated: 2025/02/04 16:23:07 by fsingh           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	main(int ac, char **argv)
+void	*add_token(char *str, t_mini *mini, t_token_type type)
 {
-	//t_mini	*mini;
-    char	*str;
+	t_token	*token;
+
+	token = malloc(sizeof(t_token));
+	if (!token)
+		free_all(mini);
+	token->type = type;
+	token->value = ft_strdup(str);
+	token->next = NULL;
+	if (!mini->token)
+		mini->token = token;
+	else
+	{
+		t_token *tmp = mini->token;
+		while (tmp->next)
+			tmp = tmp->next;
+		tmp->next = token;
+	}
+}
+
+void	tokenize(char *str, t_mini *mini)
+{
+	int		i;
+
+	i = 0;
+	while(str[i])
+	{
+		while (isspace(str[i]))
+			i++;
+		if (str[i] == '\'' || str[i] == '"')
+			extract_token_quoted(str, &i, mini);
+		else
+		{
+			int start = i;
+			while (str[i] && !isspace(str[i]) &&)
+		}
+	}
+}
+
+int	main(int ac, char **argv, char **env)
+{
+	t_mini	*mini;
+    char	*input;
 	(void)argv;
 	(void)ac;
 	int i;
@@ -23,11 +63,15 @@ int	main(int ac, char **argv)
 	i = 0;
 	while (1)
 	{
-		str = readline("user:");
-		printf("%s\n", str);
-		add_history(str);
-
+	input = readline("user:");
+	if (!input)
+	{
+		free_shell(mini);
+		break;
 	}
-
+	tokenize(input, mini);
+	add_history(input);
+	free(input);
+	}
 	return (0);
 }

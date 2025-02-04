@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fsingh <fsingh@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ssoukoun <ssoukoun@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 16:44:19 by ssoukoun          #+#    #+#             */
-/*   Updated: 2025/02/04 17:58:05 by fsingh           ###   ########.fr       */
+/*   Updated: 2025/02/04 19:02:05 by ssoukoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,13 @@ typedef struct mini
 	t_token *token;
     t_cmd   *cmd;  
 }				t_mini;
+
+//Parsing
+void	*create_token(t_token **tokens, char *cmd_line, t_mini *mini);
+void	parsing(char *input, t_mini *mini);
+
+//Utils
+int is_special(char *str);
+int ispace(char c);
 
 #endif

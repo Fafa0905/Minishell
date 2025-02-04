@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fsingh <fsingh@student.42.fr>              +#+  +:+       +#+        */
+/*   By: ssoukoun <ssoukoun@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/04 17:56:48 by fsingh            #+#    #+#             */
-/*   Updated: 2025/02/04 17:58:05 by fsingh           ###   ########.fr       */
+/*   Updated: 2025/02/04 19:03:10 by ssoukoun         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "minishell.h"
 
 void	*create_token(t_token **tokens, char *cmd_line, t_mini *mini)
@@ -40,4 +41,9 @@ void	parsing(char *input, t_mini *mini)
 		free_shell(mini);
 	replace_dollar(&input, mini);
 	create_token(&mini->token, input, mini);
+}
+
+void	add_special(t_token **tokens, char *cmd_line)
+{
+	
 }

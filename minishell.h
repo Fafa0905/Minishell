@@ -21,37 +21,26 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 
-# define IN 		1
-# define HEREDOC	2
-# define OUT		3
-# define D_OUT		4
-# define PIPE		5
-# define CMD		6
-# define ARG		7
-# define DOLLAR     8
 
-typedef struct s_cmd
+typedef struct s_outfilelist
 {
-    int             infile;
-    int             outfile;
-    char            **cmd_param;
-	struct s_token	*prev;
-	struct s_token	*next;
-}              t_cmd;
+    int                     overwrite;
+    int                     append;
+    char                    *name;
+    struct s_outfilelist    *next;
+}                            t_outfile;
 
-typedef struct token
+typedef struct s_commandlist
 {
-    char            *value;
-    int             type;
-	struct s_token	*prev;
-	struct s_token	*next;
-}				t_token;
-
-typedef struct mini
-{
-	t_token *token;
-    t_cmd   *cmd;  
-}				t_mini;
+    int                     built_in;
+    int                     pipe;
+    char                    **arguments;
+    int                     count_arg;
+    char                    **infile;
+    char                    **heredoc;
+    t_outfile               *outfile;
+    struct s_commandlist    *next;
+}                            t_commandlist;
 
 //Parsing
 void	*create_token(t_token **tokens, char *cmd_line, t_mini *mini);

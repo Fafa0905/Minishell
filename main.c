@@ -13,7 +13,7 @@
 
 int	main(int ac, char **argv, char **env)
 {
-	t_mini	*mini;
+	t_commandlist	*mini;
     char	*input;
 	(void)argv;
 	(void)ac;

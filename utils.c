@@ -20,7 +20,7 @@ int ispace(char c)
     return (0);
 }
 
-int find_lenght_arg(char *input, int i)
+int find_lenght_arg_space(char *input, int i)
 {
     char quote;
 

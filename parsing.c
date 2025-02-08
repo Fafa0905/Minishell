@@ -16,19 +16,32 @@ int		count_special_char(char *arg)
 {
 	int	i;
 	int	count;
+	int	in_word;
 
 	i = 0;
 	count = 0;
+	in_word = 0;
 	while(arg[i])
 	{
 		if (is_special(arg[i]))
+		{
 			count++;
+			in_word = 0;
+		}
+		else
+		{
+			if (in_word == 0)
+			{
+				count++;
+				in_word = 1;
+			}
+		}
 		i++;
 	}
-	return (count + 1);
+	return (count);
 }
 
-char    **split_special(char *arg)
+char    **split_special(char *arg, t_commandlist *mini)
 {
     char    **result;
     int     i;
@@ -40,7 +53,15 @@ char    **split_special(char *arg)
     count = 0;
     result = malloc(sizeof(char *) * (count_special_char(arg) + 1));
 	if (!result)
-		free_shell();
+		free_shell(mini);
+	while (arg[i])
+	{
+		if (is_special(arg[i]))
+		{
+
+		}
+		i++;
+	}
 	
 }
 
@@ -61,7 +82,7 @@ void	special_characters(t_commandlist *mini)
 		free_shell(mini);
 	while(arg[i])
 	{
-		split = split_special(arg[i]);
+		split = split_special(arg[i], mini);
 		j = 0;
 		while (split[j])
 		{
@@ -115,7 +136,7 @@ void	split_space(char *input, t_commandlist *mini)
 		if (input[i])
 		{
 			start = i;
-			i = find_lenght_arg(input, i);
+			i = find_lenght_arg_space(input, i);
 			arg[count] = extract_arg(input, start, i);
 			count++;
 		}
@@ -131,6 +152,8 @@ int	open_quote(t_commandlist *mini, char *input)
 	char	quote;
 
 	i = 0;
+	if (!input)
+		return(0);
 	while (input[i])
 	{
 		if (input[i] == '\'' || input[i] == '"')

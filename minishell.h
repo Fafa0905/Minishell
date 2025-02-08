@@ -43,11 +43,22 @@ typedef struct s_commandlist
 }                            t_commandlist;
 
 //Parsing
-void	*create_token(t_token **tokens, char *cmd_line, t_mini *mini);
-void	parsing(char *input, t_mini *mini);
+int		count_special_char(char *arg);
+char    **split_special(char *arg, t_commandlist *mini);
+void	special_characters(t_commandlist *mini);
+char	*extract_arg(char *input, int start, int end);
+void	split_space(char *input, t_commandlist *mini);
+int	    open_quote(char *input);
+void	parsing(char *input, t_commandlist *mini);
 
 //Utils
-int is_special(char *str);
-int ispace(char c);
+int     count_special_arg(char **args);
+int     count_arg(char *input);
+int     is_special(char c);
+int     ispace(char c);
+int     find_lenght_arg_space(char *input, int i);
+void    free_shell(t_commandlist    *mini);
+
+void	print_args(t_commandlist *mini);
 
 #endif

@@ -56,13 +56,28 @@ char    **split_special(char *arg, t_commandlist *mini)
 		free_shell(mini);
 	while (arg[i])
 	{
+		while (ispace(arg[i]))
+			i++;
+		start = i;
 		if (is_special(arg[i]))
 		{
-
+			result[count] = malloc(sizeof(char) * 2);
+			if (!result[count])
+				free_shell(mini);
+			result[count][0] = arg[i];
+			result[count][1] = '\0';
+			count++;
+			i++;
 		}
-		i++;
+		else
+		{
+			i = find_lenght_arg_space(arg, i);
+			result[count] = extract_arg(arg, start, i);
+			count++;
+		}
 	}
-	
+	result[count] = NULL;
+	return (result);
 }
 
 void	special_characters(t_commandlist *mini)
@@ -96,7 +111,7 @@ void	special_characters(t_commandlist *mini)
 		i++;
 	}
 	final_args[count] = NULL;
-	free_split(mini->arguments);
+	//free_split(mini->arguments);//
 	mini->arguments = final_args;
 }
 
@@ -128,7 +143,7 @@ void	split_space(char *input, t_commandlist *mini)
 	count = 0;
 	arg = malloc(sizeof(char *) * (count_arg(input) + 1));
 	if (!arg)
-		return (NULL);
+		free_shell(mini);
 	while (input[i])
 	{
 		while (ispace(input[i]))
@@ -143,10 +158,10 @@ void	split_space(char *input, t_commandlist *mini)
 	}
 	arg[count] = NULL;
 	mini->arguments = arg;
-	free_split(arg);
+	//free_split(arg);//
 }
 
-int	open_quote(t_commandlist *mini, char *input)
+int	open_quote(char *input)
 {
 	int		i;
 	char	quote;
@@ -172,8 +187,31 @@ int	open_quote(t_commandlist *mini, char *input)
 
 void	parsing(char *input, t_commandlist *mini)
 {
-	if(open_quote(mini, input))
+	if(open_quote(input))
 		free_shell(mini);
+	if (!mini)
+	{
+		printf("Error: mini is NULL\n");
+		return;
+	}
 	split_space(input, mini);
-	split_specials(mini);
+	special_characters(mini);
+	print_args(mini);
+}
+
+void	print_args(t_commandlist *mini)
+{
+	int i;
+
+	i = 0;
+	if (mini && mini->arguments)
+	{
+		while (mini->arguments[i])
+		{
+			printf("Argument %d: %s\n", i, mini->arguments[i]);
+			i++;
+		}
+	}
+	else
+		printf("pas d'arguments.\n");
 }

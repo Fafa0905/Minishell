@@ -17,9 +17,13 @@ int	main(int ac, char **argv, char **env)
     char	*input;
 	(void)argv;
 	(void)ac;
-	int i;
-	
-	i = 0;
+	(void)env;
+
+	mini = malloc(sizeof(t_commandlist));
+	if (!mini) {
+		printf("Error allocating memory for mini\n");
+		return (0);
+	}
 	while (1)
 	{
 	input = readline("user:");

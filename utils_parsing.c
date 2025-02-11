@@ -42,26 +42,31 @@ int count_special_arg(char **args)
     return (count);
 }
 
-int find_lenght_arg_space(char *input, int i)
+int		count_special_char(char *arg)
 {
-    char quote;
+	int	i;
+	int	count;
 
-    while (input[i] && !isspace(input[i]))
-    {
-        if (input[i] == '\'' || input[i] == '"')
-        {
-            quote = input[i];
-            i++;
-            while (input[i] && input[i] != quote)
-                i++;
-            if (input[i])
-                i++;
-            return (i);
-        }
-        else
-            i++;
-    }
-    return (i);
+	i = 0;
+	count = 0;
+	while(arg[i])
+	{
+		if (is_special(arg[i]))
+		{
+			count++;
+			if (arg[i + 1] && arg[i] == arg[i + 1])
+				i++;
+		}
+		else
+		{
+			count++;
+			while (arg[i] && !is_special(arg[i]))
+				i++;
+			continue;
+		}
+		i++;
+	}
+	return (count);
 }
 
 int count_arg(char *input)
@@ -82,25 +87,4 @@ int count_arg(char *input)
         }
     }
     return (count);
-}
-
-void    free_shell(t_commandlist *mini)
-{
-    int i;
-
-    printf("freeshell\n");
-    if (mini)
-    {
-        if (mini->arguments)
-        {
-            i = 0;
-            while (mini->arguments[i])
-            {
-                free(mini->arguments[i]);
-                i++;
-            }
-            free(mini->arguments);
-        }
-        free(mini);
-    }
 }

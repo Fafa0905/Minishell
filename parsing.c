@@ -12,68 +12,6 @@
 
 #include "minishell.h"
 
-int		count_special_char(char *arg)
-{
-	int	i;
-	int	count;
-
-	i = 0;
-	count = 0;
-	while(arg[i])
-	{
-		if (is_special(arg[i]))
-		{
-			count++;
-			if (arg[i + 1] && arg[i] == arg[i + 1])
-				i++;
-		}
-		else
-		{
-			count++;
-			while (arg[i] && !is_special(arg[i]))
-				i++;
-			i--;
-		}
-		i++;
-	}
-	return (count);
-}
-
-int	is_double_special(char *arg)
-{
-	return ((arg[0] == '>' && arg[1] == '>') || (arg[0] == '<' && arg[1] == '<'));
-}
-
-char	*extract_special_seq(char	*arg, t_commandlist *mini)
-{
-	char	*special;
-
-	if (is_double_special(arg))
-	{
-		special = malloc(3);
-		if (!special)
-			free_shell(mini);
-		special[0] = arg[0];
-		special[1] = arg[1];
-		special[2] = '\0';
-	}
-	else
-	{
-		special = malloc(2);
-		if (!special)
-			return (NULL);
-		special[0] = arg[0];
-		special[1] = '\0';
-	}
-	return (special);
-}
-
-void	add_arguments(char **result, int *count, char *arg)
-{
-	result[*count] = arg;
-	(*count)++;
-}
-
 char    **split_special(char *arg, t_commandlist *mini)
 {
     char    **result;
@@ -125,11 +63,16 @@ void	special_characters(t_commandlist *mini)
 	int		count;
 
 	i = 0;
-	count = 0;
 	arg = mini->arguments;
-	final_args = malloc(sizeof(char *) * count_special_arg(arg) + 1);
+	count = count_special_arg(arg) + 1;
+	final_args = malloc(sizeof(char *) * count);
+	printf("count = %d\n", count);
+	count = 0;
 	if (!final_args)
+	{
 		free_shell(mini);
+		return;
+	}
 	while(arg[i])
 	{
 		split = split_special(arg[i], mini);
@@ -146,7 +89,6 @@ void	special_characters(t_commandlist *mini)
 		i++;
 	}
 	final_args[count] = NULL;
-	//free_split(mini->arguments);//
 	mini->arguments = final_args;
 }
 
@@ -167,7 +109,7 @@ char	*extract_arg(char *input, int start, int end)
 	return (arg);
 }
 
-void	split_space(char *input, t_commandlist *mini)
+int	split_space(char *input, t_commandlist *mini)
 {
 	char	**arg;
 	int		i;
@@ -178,7 +120,7 @@ void	split_space(char *input, t_commandlist *mini)
 	count = 0;
 	arg = malloc(sizeof(char *) * (count_arg(input) + 1));
 	if (!arg)
-		free_shell(mini);
+		return (1);
 	while (input[i])
 	{
 		while (ispace(input[i]))
@@ -188,50 +130,39 @@ void	split_space(char *input, t_commandlist *mini)
 			start = i;
 			i = find_lenght_arg_space(input, i);
 			arg[count] = extract_arg(input, start, i);
+			if (!arg[count])
+			{
+				free_split(arg, count);
+                return (1);
+			}
 			count++;
 		}
 	}
 	arg[count] = NULL;
 	mini->arguments = arg;
-	//free_split(arg);//
-}
-
-int	open_quote(char *input)
-{
-	int		i;
-	char	quote;
-
-	i = 0;
-	if (!input)
-		return(0);
-	while (input[i])
-	{
-		if (input[i] == '\'' || input[i] == '"')
-		{
-			quote = input[i];
-			i++;
-			while (input[i] && input[i] != quote)
-				i++;
-			if (!input[i])
-				return (1);
-		}
-		i++;
-	}
 	return (0);
 }
 
-void	parsing(char *input, t_commandlist *mini)
+int	parsing(char *input, t_commandlist *mini)
 {
-	if(open_quote(input))
-		free_shell(mini);
-	if (!mini)
+	if (strcmp(input, "exit") == 0)
+		clean_up_and_exit(input, mini);
+	if (only_space(input))
 	{
-		printf("Error: mini is NULL\n");
-		return;
+		free_shell(mini);
+		return (1);
 	}
-	split_space(input, mini);
-	special_characters(mini);
+	if(open_quote(input))
+	{
+		free_shell(mini);
+		return (1);
+	}
+	if (split_space(input, mini) == 1)
+		return (1);
+	if (has_special(mini->arguments))
+		special_characters(mini);
 	print_args(mini);
+	return (0);
 }
 
 void	print_args(t_commandlist *mini)

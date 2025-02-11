@@ -17,24 +17,30 @@ int	main(int ac, char **argv, char **env)
     char	*input;
 	(void)argv;
 	(void)ac;
-	(void)env;
 
 	mini = malloc(sizeof(t_commandlist));
 	if (!mini) {
 		printf("Error allocating memory for mini\n");
 		return (0);
 	}
+	mini->arguments = NULL;
+	set_env(mini, env);
 	while (1)
 	{
-	input = readline("user:");
-	if (!input)
-	{
-		free_shell(mini);
-		break;
+		input = readline("user:");
+		if (!input)
+		{
+			free_shell(mini);
+			break;
+		}
+		if (parsing(input, mini) != 0)
+		{
+			free(input);
+			continue;
+		}
+		add_history(input);
+		free(input);
 	}
-	parsing(input, mini);
-	add_history(input);
-	free(input);
-	}
+	free_shell(mini);
 	return (0);
 }

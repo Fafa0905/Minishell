@@ -16,34 +16,70 @@ int		count_special_char(char *arg)
 {
 	int	i;
 	int	count;
-	int	in_word;
 
 	i = 0;
 	count = 0;
-	in_word = 0;
 	while(arg[i])
 	{
 		if (is_special(arg[i]))
 		{
 			count++;
-			in_word = 0;
+			if (arg[i + 1] && arg[i] == arg[i + 1])
+				i++;
 		}
 		else
 		{
-			if (in_word == 0)
-			{
-				count++;
-				in_word = 1;
-			}
+			count++;
+			while (arg[i] && !is_special(arg[i]))
+				i++;
+			i--;
 		}
 		i++;
 	}
 	return (count);
 }
 
+int	is_double_special(char *arg)
+{
+	return ((arg[0] == '>' && arg[1] == '>') || (arg[0] == '<' && arg[1] == '<'));
+}
+
+char	*extract_special_seq(char	*arg, t_commandlist *mini)
+{
+	char	*special;
+
+	if (is_double_special(arg))
+	{
+		special = malloc(3);
+		if (!special)
+			free_shell(mini);
+		special[0] = arg[0];
+		special[1] = arg[1];
+		special[2] = '\0';
+	}
+	else
+	{
+		special = malloc(2);
+		if (!special)
+			return (NULL);
+		special[0] = arg[0];
+		special[1] = '\0';
+	}
+	return (special);
+}
+
+void	add_arguments(char **result, int *count, char *arg)
+{
+	result[*count] = arg;
+	(*count)++;
+}
+
 char    **split_special(char *arg, t_commandlist *mini)
 {
     char    **result;
+	char	*special;
+	int		end;
+	char	*normal_arg;
     int     i;
     int     start;
     int     count;
@@ -61,19 +97,18 @@ char    **split_special(char *arg, t_commandlist *mini)
 		start = i;
 		if (is_special(arg[i]))
 		{
-			result[count] = malloc(sizeof(char) * 2);
-			if (!result[count])
+			special = extract_special_seq(&arg[i], mini);
+			if (!special)
 				free_shell(mini);
-			result[count][0] = arg[i];
-			result[count][1] = '\0';
-			count++;
-			i++;
+			add_arguments(result, &count, special);
+			i += (is_double_special(&arg[i]) ? 2 : 1);
 		}
 		else
 		{
-			i = find_lenght_arg_space(arg, i);
-			result[count] = extract_arg(arg, start, i);
-			count++;
+			end = find_lenght_arg_space(arg, i);
+			normal_arg = extract_arg(arg, start, end);
+			add_arguments(result, &count, normal_arg);
+			i = end;
 		}
 	}
 	result[count] = NULL;

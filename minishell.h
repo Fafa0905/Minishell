@@ -19,13 +19,14 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <fcntl.h>
+#include <dirent.h>
 #include <sys/wait.h>
 
 typedef struct s_lst
 {
     char *line;
-    s_lst *next;
-    s_lst *pre;
+    struct s_lst *next;
+    struct s_lst *pre;
 }               t_lst;
 
 typedef struct s_outfilelist
@@ -39,12 +40,13 @@ typedef struct s_outfilelist
 typedef struct s_commandlist
 {
     int                     built_in;
-    int                     pipe;
+    int                     *pipe;
     char                    **arguments;
     int                     count_arg;
     char                    **infile;
     char                    **heredoc;
     t_outfile               *outfile;
+    t_lst					**env;
     struct s_commandlist    *next;
 }                            t_commandlist;
 

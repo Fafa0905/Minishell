@@ -145,6 +145,8 @@ int	split_space(char *input, t_commandlist *mini)
 
 int	parsing(char *input, t_commandlist *mini)
 {
+	
+
 	if (strcmp(input, "exit") == 0)
 		clean_up_and_exit(input, mini);
 	if (only_space(input))
@@ -161,6 +163,7 @@ int	parsing(char *input, t_commandlist *mini)
 		return (1);
 	if (has_special(mini->arguments))
 		special_characters(mini);
+	build_in(mini);
 	print_args(mini);
 	return (0);
 }

@@ -15,7 +15,7 @@ CC = cc
 HEAD = .
 CFLAGS = -g3 -Wall -Werror -Wextra
 LDFLAGS = -lreadline  # Ajout du linking readline
-SOURCES = main.c parsing.c free_shell.c utils_parsing.c utils_parsing_2.c utils_parsing_3.c env_management.c
+SOURCES = main.c parsing.c free_shell.c utils_parsing.c utils_parsing_2.c env_management.c utils_3.c
 OBJECTS = $(SOURCES:.c=.o)  # Génération des fichiers .o automatiquement
 
 

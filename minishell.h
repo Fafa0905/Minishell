@@ -88,5 +88,16 @@ void	append_node(t_commandlist *mini, char *env);
 t_lst	*find_last(t_lst *stack);
 
 void	print_args(t_commandlist *mini);
+//build_in
+void	build_in(t_commandlist *mini);
+void	ft_exit(t_commandlist *mini);
+void	ft_echo(t_commandlist *mini);
+void	ft_env(t_commandlist *mini);
+void	ft_unset(t_commandlist *mini);
+void	deletenode();
+int	ft_stri(char *str, char c);
+void	ft_export(t_commandlist *mini);
+void	ft_pwd(t_commandlist *mini);
+void	ft_cd(t_commandlist *mini);
 
 #endif

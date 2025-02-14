@@ -145,24 +145,17 @@ int	split_space(char *input, t_commandlist *mini)
 
 int	parsing(char *input, t_commandlist *mini)
 {
-	
-
 	if (strcmp(input, "exit") == 0)
 		clean_up_and_exit(input, mini);
 	if (only_space(input))
-	{
-		free_shell(mini);
-		return (1);
-	}
+		return (free_shell(mini), 1);
 	if(open_quote(input))
-	{
-		free_shell(mini);
-		return (1);
-	}
+		return (free_shell(mini),1);
 	if (split_space(input, mini) == 1)
 		return (1);
 	if (has_special(mini->arguments))
 		special_characters(mini);
+	lux(mini);
 	build_in(mini);
 	print_args(mini);
 	return (0);

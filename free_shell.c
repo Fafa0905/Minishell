@@ -4,20 +4,18 @@ void    free_shell(t_commandlist *mini)
 {
     printf("freeshell\n");
     if (mini)
-    {
         if (mini->arguments)
-        {
-            free_split(mini->arguments, -1);
-        }
-    }
+            free_split(mini->arguments);
 }
 
-void    free_split(char **split, int count)
+void    free_split(char **split)
 {
     int i;
 
     i = 0;
-    while (i < count)
+    if (!split)
+        return;
+    while (split[i])
     {
         if (split[i])
         {
@@ -30,10 +28,12 @@ void    free_split(char **split, int count)
     split = NULL;
 }
 
-void clean_up_and_exit(char *input, t_commandlist *mini)
+void    clean_up_and_exit(char *input, t_commandlist *mini)
 {
     if (input)
         free(input);
-    free_shell(mini);
+    if (mini)
+        free_shell(mini);
+    rl_clear_history();
     exit(0);
 }

@@ -51,11 +51,11 @@ typedef struct s_commandlist
 }                            t_commandlist;
 
 //Parsing
-char    **split_special(char *arg, t_commandlist *mini);
-void	special_characters(t_commandlist *mini);
-char	*extract_arg(char *input, int start, int end);
-int 	split_space(char *input, t_commandlist *mini);
-int	    parsing(char *input, t_commandlist *mini);
+char        **split_special(char *arg, t_commandlist *mini);
+void	    special_characters(t_commandlist *mini);
+char	    *extract_arg(char *input, int start, int end);
+int	        split_space(char *input, t_commandlist *mini);
+int	        parsing(char *input, t_commandlist *mini);
 
 //Utils_Parsing_1
 int     ispace(char c);
@@ -72,8 +72,10 @@ int	    is_double_special(char *arg);
 void	add_arguments(char **result, int *count, char *arg);
 
 //Utils_3
-char	*extract_special_seq(char	*arg, t_commandlist *mini);
+char	*extract_special_seq(char	*arg);
 int	    open_quote(char *input);
+int     find_lenght_arg_special(char *input, int i);
+int	    count_final_arg(char **tab);
 
 //free
 void    free_shell(t_commandlist    *mini);

@@ -30,12 +30,10 @@ char    **split_special(char *arg, t_commandlist *mini)
 		free_shell(mini);
 	while (arg[i])
 	{
-		while (ispace(arg[i]))
-			i++;
 		start = i;
 		if (is_special(arg[i]))
 		{
-			special = extract_special_seq(&arg[i], mini);
+			special = extract_special_seq(&arg[i]);
 			if (!special)
 				free_shell(mini);
 			add_arguments(result, &count, special);
@@ -43,7 +41,7 @@ char    **split_special(char *arg, t_commandlist *mini)
 		}
 		else
 		{
-			end = find_lenght_arg_space(arg, i);
+			end = find_lenght_arg_special(arg, i);
 			normal_arg = extract_arg(arg, start, end);
 			add_arguments(result, &count, normal_arg);
 			i = end;
@@ -66,7 +64,6 @@ void	special_characters(t_commandlist *mini)
 	arg = mini->arguments;
 	count = count_special_arg(arg) + 1;
 	final_args = malloc(sizeof(char *) * count);
-	printf("count = %d\n", count);
 	count = 0;
 	if (!final_args)
 	{
@@ -89,6 +86,8 @@ void	special_characters(t_commandlist *mini)
 		i++;
 	}
 	final_args[count] = NULL;
+    if (mini->arguments)
+		free_shell(mini);
 	mini->arguments = final_args;
 }
 
@@ -117,8 +116,9 @@ int	split_space(char *input, t_commandlist *mini)
 	int		count;
 
 	i = 0;
+	count = (count_arg(input) + 1);
+	arg = malloc(sizeof(char *) * count);
 	count = 0;
-	arg = malloc(sizeof(char *) * (count_arg(input) + 1));
 	if (!arg)
 		return (1);
 	while (input[i])
@@ -132,7 +132,7 @@ int	split_space(char *input, t_commandlist *mini)
 			arg[count] = extract_arg(input, start, i);
 			if (!arg[count])
 			{
-				free_split(arg, count);
+				free_split(arg);
                 return (1);
 			}
 			count++;
@@ -148,9 +148,9 @@ int	parsing(char *input, t_commandlist *mini)
 	if (strcmp(input, "exit") == 0)
 		clean_up_and_exit(input, mini);
 	if (only_space(input))
-		return (free_shell(mini), 1);
+		return (1);
 	if(open_quote(input))
-		return (free_shell(mini),1);
+		return (1);
 	if (split_space(input, mini) == 1)
 		return (1);
 	if (has_special(mini->arguments))

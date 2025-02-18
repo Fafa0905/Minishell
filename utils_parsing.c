@@ -42,6 +42,16 @@ int count_special_arg(char **args)
     return (count);
 }
 
+int     is_quoted(char *str)
+{
+    int i;
+
+    i = 0;
+    if (str[i] == '\'' || str[i] == '"')
+        return (0);
+    return (1);
+}
+
 int		count_special_char(char *arg)
 {
 	int	i;
@@ -49,6 +59,11 @@ int		count_special_char(char *arg)
 
 	i = 0;
 	count = 0;
+	if (!is_quoted(arg))
+    	{
+        	count = 1;
+       		return (count);
+   	}
 	while(arg[i])
 	{
 		if (is_special(arg[i]))

@@ -30,24 +30,52 @@ int	only_space(char *input)
 	return (1);
 }
 
-int find_lenght_arg_space(char *input, int i)
+int find_lenght_arg_special(char *input, int i)
 {
-    char quote;
+	char	quote;
 
-    while (input[i] && !isspace(input[i]))
+    while (input[i] && !ispace(input[i]))
     {
         if (input[i] == '\'' || input[i] == '"')
         {
-            quote = input[i];
-            i++;
+            quote = input[i++];
             while (input[i] && input[i] != quote)
                 i++;
             if (input[i])
                 i++;
-            return (i);
+			return (i);
+        }
+		else
+		{
+			while (input[i] && !ispace(input[i]) && input[i] != '\'' && input[i] != '"' && !is_special(input[i]))
+            	i++;
+			return (i);
+		}
+	}
+	return (i);
+}
+
+int find_lenght_arg_space(char *input, int i)
+{
+    char quote;
+
+    while (input[i] && !ispace(input[i]))
+    {
+        if (input[i] == '\'' || input[i] == '"')
+        {
+            quote = input[i++];
+            while (input[i] && input[i] != quote)
+                i++;
+            if (input[i])
+                i++;
+			return (i);
         }
         else
-            i++;
+	{
+		while (input[i] && !ispace(input[i]) && input[i] != '\'' && input[i] != '"')
+            		i++;
+		return (i);
+	}
     }
     return (i);
 }

@@ -18,73 +18,94 @@
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <signal.h>
 #include <fcntl.h>
 #include <sys/wait.h>
 
-typedef struct s_lst
+/*typedef struct s_lst
 {
     char *line;
     s_lst *next;
     s_lst *pre;
-}               t_lst;
+}               t_lst;*/
 
-typedef struct s_outfilelist
+typedef enum e_token_type
 {
-    int                     overwrite;
-    int                     append;
-    char                    *name;
-    struct s_outfilelist    *next;
-}                            t_outfile;
+    TOKEN_ARG,
+    TOKEN_PIPE,
+    TOKEN_OUT,
+    TOKEN_IN,
+    TOKEN_APPEND,
+    TOKEN_HEREDOC,
+} t_token_type;
+
+typedef struct s_token
+{
+    t_token_type    type;
+    char            *value;
+    struct s_token  *next;
+} t_token;
+
+typedef struct s_arg
+{
+    char        *content;
+    struct s_arg *next;
+} t_arg;
+
+typedef struct s_command
+{
+    t_arg      *args;
+    t_arg      *infile;
+    t_arg       *outfile;
+    t_arg      *append;
+    t_arg      *heredoc;
+    struct s_command *next;
+} t_command;
 
 typedef struct s_commandlist
 {
-    int                     built_in;
-    int                     pipe;
-    char                    **arguments;
-    int                     count_arg;
-    char                    **infile;
-    char                    **heredoc;
-    t_outfile               *outfile;
-    struct s_commandlist    *next;
+    int                     *pipe;
+    t_token                 *tokens;
+    /*t_lst					**env;*/
+    t_command               *cmd;
 }                            t_commandlist;
 
 //Parsing
-char    **split_special(char *arg, t_commandlist *mini);
-void	special_characters(t_commandlist *mini);
-char	*extract_arg(char *input, int start, int end);
-int 	split_space(char *input, t_commandlist *mini);
+void    handle_single_redirect(char *input, int *i, t_commandlist *mini, t_token_type token_type);
+void    handle_pipe(char *input, int *i, t_commandlist *mini, t_token_type token_type);
+int 	handle_arguments(char *input, int *i, t_commandlist *mini);
+int 	lexing(char *input, t_commandlist *mini);
 int	    parsing(char *input, t_commandlist *mini);
+
+//Parsing2
+t_command   *init_command(void);
+int	        parse_token(t_commandlist *mini);
 
 //Utils_Parsing_1
 int     ispace(char c);
 int     is_special(char c);
-int     count_special_arg(char **args);
-int		count_special_char(char *arg);
-int     count_arg(char *input);
-
-//Utils_Parsing_2
-int	    has_special(char **arg);
 int	    only_space(char *input);
-int     find_lenght_arg_space(char *input, int i);
-int	    is_double_special(char *arg);
-void	add_arguments(char **result, int *count, char *arg);
-
-//Utils_3
-char	*extract_special_seq(char	*arg, t_commandlist *mini);
 int	    open_quote(char *input);
+char    *ft_strndup(const char *s, size_t n);
+
+//utils_parsing_2
+int	    checking_error_before(char *input);
+int	    add_token(t_commandlist *mini, t_token_type type, char *token_value);
+void    handle_double_redirect(char *input, int *i, t_commandlist *mini, t_token_type token_type);
 
 //free
 void    free_shell(t_commandlist    *mini);
-void    free_split(char **split, int count);
 void    clean_up_and_exit(char *input, t_commandlist *mini);
+void    free_split(char **split);
 
 //env
-void	lux(t_commandlist *mini);
+/*void	lux(t_commandlist *mini);
 char    *look_env(t_commandlist *mini, char *tab);
 void	set_env(t_commandlist *mini, char **env);
 void	append_node(t_commandlist *mini, char *env);
-t_lst	*find_last(t_lst *stack);
+t_lst	*find_last(t_lst *stack);*/
 
 void	print_args(t_commandlist *mini);
+void print_commands(t_command *cmd);
 
-#endif
+# endif

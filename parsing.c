@@ -12,134 +12,97 @@
 
 #include "minishell.h"
 
-char    **split_special(char *arg, t_commandlist *mini)
+void handle_single_redirect(char *input, int *i, t_commandlist *mini, t_token_type token_type)
 {
-    char    **result;
-	char	*special;
-	int		end;
-	char	*normal_arg;
-    int     i;
-    int     start;
-    int     count;
+	int		start;
+	char	*file;
 
-    i = 0;
-    start = 0;
-    count = 0;
-    result = malloc(sizeof(char *) * (count_special_char(arg) + 1));
-	if (!result)
-		free_shell(mini);
-	while (arg[i])
+	(*i) += 1;
+	while (input[*i] && isspace(input[*i]))
+		(*i)++;
+	start = *i;
+	while (input[*i] && !isspace(input[*i]) && !is_special(input[*i]))
+		(*i)++;
+	file = ft_strndup(&input[start], *i - start);
+	add_token(mini, token_type, file);
+	free (file);
+	while (input[*i] && isspace(input[*i]))
+		(*i)++;
+}
+
+void handle_pipe(char *input, int *i, t_commandlist *mini, t_token_type token_type)
+{
+	add_token(mini, token_type, "|");
+	(*i)++;
+	while (input[*i] && isspace(input[*i]))
+		(*i)++;
+}
+
+int	handle_arguments(char *input, int *i, t_commandlist *mini)
+{
+	int		start;
+	char	quote;
+	char	*current_token;
+
+	current_token = NULL;
+	start = *i;
+	while (input[*i] && !is_special(input[*i]) && !isspace(input[*i]))
 	{
-		while (ispace(arg[i]))
-			i++;
-		start = i;
-		if (is_special(arg[i]))
+		if (input[*i] == '\'' || input[*i] == '"')
 		{
-			special = extract_special_seq(&arg[i], mini);
-			if (!special)
-				free_shell(mini);
-			add_arguments(result, &count, special);
-			i += (is_double_special(&arg[i]) ? 2 : 1);
+			quote = input[*i];
+			(*i)++;
+			while (input[*i] && input[*i] != quote)
+			{
+				(*i)++;
+				if (input[*i] == '\0')
+					return (1);
+			}
+			(*i)++;
 		}
 		else
-		{
-			end = find_lenght_arg_space(arg, i);
-			normal_arg = extract_arg(arg, start, end);
-			add_arguments(result, &count, normal_arg);
-			i = end;
-		}
+			(*i)++;
 	}
-	result[count] = NULL;
-	return (result);
-}
-
-void	special_characters(t_commandlist *mini)
-{
-	char	**arg;
-	char	**final_args;
-	char	**split;
-	int		i;
-	int		j;
-	int		count;
-
-	i = 0;
-	arg = mini->arguments;
-	count = count_special_arg(arg) + 1;
-	final_args = malloc(sizeof(char *) * count);
-	printf("count = %d\n", count);
-	count = 0;
-	if (!final_args)
-	{
-		free_shell(mini);
-		return;
-	}
-	while(arg[i])
-	{
-		split = split_special(arg[i], mini);
-		j = 0;
-		while (split[j])
-		{
-			final_args[count] = split[j];
-			if (!final_args)
-				free_shell(mini);
-			j++;
-			count++;
-		}
-		free(split);
-		i++;
-	}
-	final_args[count] = NULL;
-	mini->arguments = final_args;
-}
-
-char	*extract_arg(char *input, int start, int end)
-{
-	char	*arg;
-	int		i;
-	int		j;
-
-	arg = malloc(sizeof(char) * (end - start + 1));
-	if (!arg)
-		return (NULL);
-	i = start;
-	j = 0;
-	while (i < end)
-		arg[j++] = input[i++];
-	arg[j] = '\0';
-	return (arg);
-}
-
-int	split_space(char *input, t_commandlist *mini)
-{
-	char	**arg;
-	int		i;
-	int		start;
-	int		count;
-
-	i = 0;
-	count = 0;
-	arg = malloc(sizeof(char *) * (count_arg(input) + 1));
-	if (!arg)
+	current_token = ft_strndup(&input[start], *i - start);
+	if (!current_token)
 		return (1);
+	add_token(mini, TOKEN_ARG, current_token);
+	free(current_token);
+	while (input[*i] && isspace(input[*i]))
+		(*i)++;
+	return (0);
+}
+
+int	lexing(char *input, t_commandlist *mini)
+{
+	int		i;
+
+	mini->tokens = NULL;
+	i = 0;
 	while (input[i])
 	{
-		while (ispace(input[i]))
+		while (isspace(input[i]))
 			i++;
-		if (input[i])
+		if (is_special(input[i]))
 		{
-			start = i;
-			i = find_lenght_arg_space(input, i);
-			arg[count] = extract_arg(input, start, i);
-			if (!arg[count])
-			{
-				free_split(arg, count);
-                return (1);
-			}
-			count++;
+			if (input[i] == '|')
+				handle_pipe(input, &i, mini, TOKEN_PIPE);
+			else if (input[i] == '>' && input[i + 1] == '>')
+				handle_double_redirect(input, &i, mini, TOKEN_APPEND);
+			else if (input[i] == '<' && input[i + 1] == '<')
+				handle_double_redirect(input, &i, mini, TOKEN_HEREDOC);
+			else if (input[i] == '>')
+				handle_single_redirect(input, &i, mini, TOKEN_OUT);
+			else if (input[i] == '<')
+				handle_single_redirect(input, &i, mini, TOKEN_IN);
 		}
+		else
+		{	if (handle_arguments(input, &i, mini))
+				return (1);
+		}
+		while (isspace(input[i]))
+			i++;
 	}
-	arg[count] = NULL;
-	mini->arguments = arg;
 	return (0);
 }
 
@@ -147,37 +110,65 @@ int	parsing(char *input, t_commandlist *mini)
 {
 	if (strcmp(input, "exit") == 0)
 		clean_up_and_exit(input, mini);
-	if (only_space(input))
-	{
-		free_shell(mini);
+	if (checking_error_before(input))
 		return (1);
-	}
-	if(open_quote(input))
-	{
-		free_shell(mini);
+	if (lexing(input, mini) == 1)
 		return (1);
-	}
-	if (split_space(input, mini) == 1)
+	if (parse_token(mini) == 1)
 		return (1);
-	if (has_special(mini->arguments))
-		special_characters(mini);
+	/*lux(mini);
+	build_in(mini);*/
 	print_args(mini);
+	print_commands(mini->cmd);
 	return (0);
 }
-
-void	print_args(t_commandlist *mini)
+void print_args(t_commandlist *mini)
 {
-	int i;
+	t_token *temp_tokens;
+	
+	temp_tokens = mini->tokens;
+    while (temp_tokens)
+    {
+        printf("Token: %s, Type: %d\n", temp_tokens->value, temp_tokens->type);
+        temp_tokens = temp_tokens->next;
+    }
+}
 
-	i = 0;
-	if (mini && mini->arguments)
-	{
-		while (mini->arguments[i])
-		{
-			printf("Argument %d: %s\n", i, mini->arguments[i]);
-			i++;
-		}
-	}
-	else
-		printf("pas d'arguments.\n");
+void print_redirections(t_arg *redir, const char *type)
+{
+    while (redir)
+    {
+        printf("  %s: %s\n", type, redir->content);
+        redir = redir->next;
+    }
+}
+
+void print_commands(t_command *cmd)
+{
+	t_command	*temp;
+
+	temp = cmd;
+    while (temp)
+    {
+        printf("Commande:\n");
+        
+        // Affiche les arguments
+        t_arg *arg = temp->args;
+        while (arg)
+        {
+            printf("  Argument: %s\n", arg->content);
+            arg = arg->next;
+        }
+
+        // Affiche les redirections si elles existent
+        if (temp->infile)
+            print_redirections(temp->infile, "Infile");
+        if (temp->outfile)
+            print_redirections(temp->outfile, "Outfile");
+        if (temp->append)
+            print_redirections(temp->append, "Append");
+        if (temp->heredoc)
+            print_redirections(temp->heredoc, "Heredoc");
+        temp = temp->next;
+    }
 }

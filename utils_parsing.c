@@ -14,8 +14,8 @@
 
 int ispace(char c)
 {
-	if (c && (c == ' ' || c == '\n' || c == '\r' || c == '\f' || c == '\t' \
-	|| c == '\v'))
+	if (c == ' ' || c == '\n' || c == '\r' || c == '\f' || c == '\t' \
+	|| c == '\v')
         return (1);
     return (0);
 }
@@ -27,64 +27,60 @@ int is_special(char c)
     return (0);
 }
 
-int count_special_arg(char **args)
-{
-    int i;
-    int count;
-
-    i = 0;
-    count = 0;
-    while (args[i])
-    {
-        count += count_special_char(args[i]);
-        i++;
-    }
-    return (count);
-}
-
-int		count_special_char(char *arg)
+int	only_space(char *input)
 {
 	int	i;
-	int	count;
 
 	i = 0;
-	count = 0;
-	while(arg[i])
+	if (!input || input[0] == '\0')
+		return (1);
+	while (input[i])
 	{
-		if (is_special(arg[i]))
+		if (!ispace(input[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+char *ft_strndup(const char *str, size_t n)
+{
+    char *res;
+    size_t i;
+
+    i = 0;
+    res = (char *)malloc(n + 1);
+    if (res == NULL)
+        return (NULL);
+    while (i < n && str[i] != '\0')
+    {
+        res[i] = str[i];
+        i++;
+    }
+    res[i] = '\0';
+    return (res);
+}
+
+int	open_quote(char *input)
+{
+	int		i;
+	char	quote;
+
+	i = 0;
+	if (!input)
+		return(0);
+	while (input[i])
+	{
+		if (input[i] == '\'' || input[i] == '"')
 		{
-			count++;
-			if (arg[i + 1] && arg[i] == arg[i + 1])
+			quote = input[i];
+			i++;
+			while (input[i] && input[i] != quote)
 				i++;
-		}
-		else
-		{
-			count++;
-			while (arg[i] && !is_special(arg[i]))
-				i++;
-			continue;
+			if (!input[i])
+				return (1);
 		}
 		i++;
 	}
-	return (count);
-}
-
-int count_arg(char *input)
-{
-    int i;
-    int count;
-
-    i = 0;
-    count = 0;
-    while (input[i])
-    {
-        while (ispace(input[i]))
-            i++;
-        if (input[i])
-        {
-            count++;
-            i = find_lenght_arg_space(input, i);
-        }
-    }
-    return (count);
+	return (0);
 }

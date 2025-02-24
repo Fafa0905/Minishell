@@ -11,36 +11,49 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
+t_commandlist	*init_shell()
+{
+	t_commandlist	*mini;
+
+	mini = malloc(sizeof(t_commandlist));
+	if (!mini)
+		return (NULL);
+	mini->tokens = NULL;
+	mini->cmd = NULL;
+	return (mini);
+}
+
 int	main(int ac, char **argv, char **env)
 {
 	t_commandlist	*mini;
     char	*input;
 	(void)argv;
 	(void)ac;
+	(void)env;
 
-	mini = malloc(sizeof(t_commandlist));
-	if (!mini) {
-		printf("Error allocating memory for mini\n");
-		return (0);
-	}
-	mini->arguments = NULL;
-	set_env(mini, env);
+	mini = init_shell();
+	if (!mini)
+		return (printf("Error allocating memory\n"), 1);
+	/*set_env(mini, env);*/
 	while (1)
 	{
 		input = readline("user:");
 		if (!input)
 		{
-			free_shell(mini);
-			break;
+			free(input);
+			return (1);
 		}
+		if (*input)
+			add_history(input);
 		if (parsing(input, mini) != 0)
 		{
 			free(input);
 			continue;
 		}
-		add_history(input);
 		free(input);
+		free_shell(mini);
 	}
-	free_shell(mini);
+	free(mini);
+	rl_clear_history();
 	return (0);
 }

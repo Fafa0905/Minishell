@@ -1,4 +1,4 @@
-#include "minishell.h"
+/*#include "minishell.h"
 
 void	lux(t_commandlist *mini)
 {
@@ -78,4 +78,4 @@ t_lst	*find_last(t_lst *stack)
 	while (stack->next)
 		stack = stack->next;
 	return (stack);
-}
+}*/
